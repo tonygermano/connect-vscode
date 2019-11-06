@@ -1,3 +1,3 @@
-load('init');
+load('init.jsx');
 
 logger.info(DatabaseConnection)
