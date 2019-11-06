@@ -1,0 +1,48 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run in Rhino shell",
+            "type": "process",
+            "command": "java",
+            "args": [
+                "org.mozilla.javascript.tools.shell.Main",
+                "-version",
+                "${config:mirth.rhinoLanguageVersion}",
+                "-modules",
+                "modules",
+                "${file}"
+            ],
+            "options": {
+                "env": {
+                    "CLASSPATH": "lib/${config:mirth.rhinoJar}"
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Debug in Rhino",
+            "type": "process",
+            "command": "java",
+            "args": [
+                "org.mozilla.javascript.tools.debugger.Main",
+                "-version",
+                "${config:mirth.rhinoLanguageVersion}",
+                "-modules",
+                "modules",
+                "${file}"
+            ],
+            "options": {
+                "env": {
+                    "CLASSPATH": "lib/${config:mirth.rhinoJar}"
+                }
+            },
+            "group": "build"
+        }
+    ]
+}

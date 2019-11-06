@@ -1,0 +1,38 @@
+{
+    /*
+        mirth 3.7, 3.8
+
+        Default value of the language version is 200 (ES6 mode) for new
+        installations or 0 for upgrades from versions prior to 3.7.
+    */ 
+    "mirth.rhinoJar": "rhino-1.7.9.jar",
+    "mirth.rhinoLanguageVersion": "200",
+
+    /*
+        mirth 3.6
+
+        Versions prior to 3.7 did not allow you to change the value of the language
+        version from 0. Max for this version of rhino is 180.
+    */ 
+    //"mirth.rhinoJar": "rhino-1.7.7.1.jar",
+    //"mirth.rhinoLanguageVersion" : "0",
+
+    /*
+        mirth 3.3, 3.4, 3.5
+
+        Versions prior to 3.7 did not allow you to change the value of the language
+        version from 0. Max for this version of rhino is 180.
+    */ 
+    //"mirth.rhinoJar": "rhino-1.7.6.jar",
+    //"mirth.rhinoLanguageVersion" : "0",
+
+    /*
+        mirth 3.0, 3.1, 3.2
+
+        Versions prior to 3.7 did not allow you to change the value of the language
+        version from 0. Max for this version of rhino is 180.
+    */ 
+    //"mirth.rhinoJar": "rhino-1.7R5-20120629.144839-4.jar",
+    //"mirth.rhinoLanguageVersion" : "0",
+
+}
