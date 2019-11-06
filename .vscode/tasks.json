@@ -17,7 +17,7 @@
             ],
             "options": {
                 "env": {
-                    "CLASSPATH": "lib/${config:mirth.rhinoJar}"
+                    "CLASSPATH": "lib/rhino/${config:mirth.rhinoJar}"
                 }
             },
             "group": {
@@ -39,7 +39,7 @@
             ],
             "options": {
                 "env": {
-                    "CLASSPATH": "lib/${config:mirth.rhinoJar}"
+                    "CLASSPATH": "lib/rhino/${config:mirth.rhinoJar}"
                 }
             },
             "group": "build"
