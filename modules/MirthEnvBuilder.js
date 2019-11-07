@@ -19,7 +19,12 @@ exports.MirthEnvBuilder = (function() {
     }
 
     MirthEnvBuilder.prototype.setMirthPath = function setMirthPath(pathString) {
-        this.clb = new ClassLoaderBuilder(this.cx).setMirthPath(pathString);
+        this.clb = this.clb.setMirthPath(pathString);
+        return this;
+    }
+
+    MirthEnvBuilder.prototype.applyToClassLoaderBuilder = function applyToClassLoaderBuilder(consumer) {
+        consumer(this.clb);
         return this;
     }
 
