@@ -19,6 +19,7 @@ exports.ClassLoaderBuilder = (function() {
         this.mirthPath = null;
         this.additionalUrls = new HashSet();
         this.excludeJars = new HashSet();
+        this.parentClassLoader = undefined;
     }
 
     ClassLoaderBuilder.prototype.setMirthPath = function setMirthPath(pathString) {
@@ -36,17 +37,25 @@ exports.ClassLoaderBuilder = (function() {
         return this;
     }
 
+    ClassLoaderBuilder.prototype.setParentClassLoader = function (cl) {
+        this.parentClassLoader = cl;
+        return this;
+    }
+
     ClassLoaderBuilder.prototype.build = function build() {
         var self = this;
         var URLs = [];
-        includeDirs.forEach(function(dir) {
-            recursiveJarGetter(Paths.get(self.mirthPath, dir), URLs);
-        });
+        if (self.mirthPath) {
+            includeDirs.forEach(function(dir) {
+                recursiveJarGetter(Paths.get(self.mirthPath, dir), URLs);
+            });
+            URLs.push(Paths.get(self.mirthPath, 'conf/mirth.properties').toUri().toURL());
+        }
         for (var url in Iterator(self.additionalUrls)) {
             URLs.push(url);
         }
-        URLs.push(Paths.get(self.mirthPath, 'conf/mirth.properties').toUri().toURL());
-        var cl = new URLClassLoader(URLs);
+        
+        var cl = (self.parentClassLoader !== undefined) ? new URLClassLoader(URLs, self.parentClassLoader) : new URLClassLoader(URLs);
 
         if (self.cx) {
             self.cx.Packages = self.cx.Packages(cl);
