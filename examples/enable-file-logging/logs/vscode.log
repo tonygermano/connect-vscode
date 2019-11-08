@@ -1,0 +1,2 @@
+2019-11-07 20:55:24,147 INFO  - this should only show up in the file
+2019-11-07 20:55:24,148 ERROR - this should log to both file and console
