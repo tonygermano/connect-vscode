@@ -28,6 +28,11 @@ exports.MirthEnvBuilder = (function() {
         return this;
     }
 
+    MirthEnvBuilder.prototype.applyToLoggerBuilder = function applyToLoggerBuilder(consumer) {
+        consumer(this.lb);
+        return this;
+    }
+
     MirthEnvBuilder.prototype.init = function init() {
         this.clb.build();
         this.lb.build();
