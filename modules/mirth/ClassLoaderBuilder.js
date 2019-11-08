@@ -6,6 +6,7 @@ exports.ClassLoaderBuilder = (function() {
     const HashSet = java.util.HashSet;
     const URL = java.net.URL;
     const URLClassLoader = java.net.URLClassLoader;
+    const Context = org.mozilla.javascript.Context;
 
     const includeDirs = [
         'server-launcher-lib',
@@ -66,18 +67,23 @@ exports.ClassLoaderBuilder = (function() {
         for (var path in Iterator(self.additionalJarDirs)) {
             jarDirAdder(path, URLs);
         }
-        
-        var cl = (self.parentClassLoader !== undefined) ? new URLClassLoader(URLs, self.parentClassLoader) : new URLClassLoader(URLs);
 
+        var rhinoContext = Context.getCurrentContext();
+        var currentAppClassLoader = rhinoContext.getApplicationClassLoader();
+        
+        var cl;
+        if (self.parentClassLoader === undefined) {
+            cl = new URLClassLoader(URLs, currentAppClassLoader);
+        }
+        else {
+            cl = new URLClassLoader(URLs, self.parentClassLoader);
+        }
         if (self.cx) {
-            var packagesClassName = new java.lang.Object().getClass().getMethod('getClass').invoke(Packages).getName();
-            if (packagesClassName == 'org.mozilla.javascript.NativeJavaTopPackage') {
-                self.cx.TopPackage = Packages;
+            rhinoContext.setApplicationClassLoader(cl);
+            org.mozilla.javascript.NativeJavaTopPackage.init(rhinoContext, self.cx, true);
+            if (!currentAppClassLoader.loadClass('org.mozilla.javascript.commonjs.module.ModuleScope').isInstance(self.cx)) {
+                rhinoContext.setApplicationClassLoader(currentAppClassLoader);
             }
-            self.cx.Packages = self.cx.Packages(cl);
-            ["java", "javax", "org", "com", "edu", "net"].forEach(function(pkg) {
-                self.cx[pkg] = self.cx.Packages[pkg];
-            });
         }
 
         return cl;
