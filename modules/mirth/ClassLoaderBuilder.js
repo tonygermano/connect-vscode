@@ -18,17 +18,23 @@ exports.ClassLoaderBuilder = (function() {
         this.cx = cx;
         this.mirthPath = null;
         this.additionalUrls = new HashSet();
+        this.additionalJarDirs = new HashSet();
         this.excludeJars = new HashSet();
         this.parentClassLoader = undefined;
     }
 
     ClassLoaderBuilder.prototype.setMirthPath = function setMirthPath(pathString) {
-        this.mirthPath = Paths.get(pathString);
+        this.mirthPath = pathString ? Paths.get(pathString) : null;
         return this;
     }
 
-    ClassLoaderBuilder.prototype.addUrlPath = function addUrlPath(pathString) {
+    ClassLoaderBuilder.prototype.addUrlString = function addUrlString(pathString) {
         this.additionalUrls.add(new URL(pathString));
+        return this;
+    }
+
+    ClassLoaderBuilder.prototype.addJarDirPath = function addJarDirPath(pathString) {
+        this.additionalJarDirs.add(Paths.get(pathString));
         return this;
     }
 
@@ -45,19 +51,29 @@ exports.ClassLoaderBuilder = (function() {
     ClassLoaderBuilder.prototype.build = function build() {
         var self = this;
         var URLs = [];
+
         if (self.mirthPath) {
             includeDirs.forEach(function(dir) {
-                recursiveJarGetter(Paths.get(self.mirthPath, dir), URLs);
+                recursiveJarAdder(Paths.get(self.mirthPath, dir), URLs);
             });
             URLs.push(Paths.get(self.mirthPath, 'conf/mirth.properties').toUri().toURL());
         }
+
         for (var url in Iterator(self.additionalUrls)) {
             URLs.push(url);
+        }
+
+        for (var path in Iterator(self.additionalJarDirs)) {
+            jarDirAdder(path, URLs);
         }
         
         var cl = (self.parentClassLoader !== undefined) ? new URLClassLoader(URLs, self.parentClassLoader) : new URLClassLoader(URLs);
 
         if (self.cx) {
+            var packagesClassName = new java.lang.Object().getClass().getMethod('getClass').invoke(Packages).getName();
+            if (packagesClassName == 'org.mozilla.javascript.NativeJavaTopPackage') {
+                self.cx.TopPackage = Packages;
+            }
             self.cx.Packages = self.cx.Packages(cl);
             ["java", "javax", "org", "com", "edu", "net"].forEach(function(pkg) {
                 self.cx[pkg] = self.cx.Packages[pkg];
@@ -66,7 +82,17 @@ exports.ClassLoaderBuilder = (function() {
 
         return cl;
 
-        function recursiveJarGetter(dirPath, URLs) {
+        function jarDirAdder(dirPath, URLs) {
+            Files.list(dirPath).forEach({accept: function(path) {
+                const name = path.getFileName().toString();
+                if (Files.isRegularFile(path) && Files.isReadable(path)
+                        && name.endsWith('.jar') && !self.excludeJars.contains(name)) {
+                    URLs.push(path.toUri().toURL());
+                }
+            }});
+        }
+
+        function recursiveJarAdder(dirPath, URLs) {
             Files.walkFileTree(dirPath, new JavaAdapter(java.nio.file.SimpleFileVisitor, {
                 visitFile: function visitFile(path, attrs) {
                     const name = path.getFileName().toString();
