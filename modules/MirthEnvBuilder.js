@@ -5,45 +5,45 @@ var {MirthJavaScriptIncludes} = require('mirth/MirthJavaScriptIncludes');
 exports.MirthEnvBuilder = (function() {
     function MirthEnvBuilder(cx) {
         this.cx = cx;
-        this.clb = new ClassLoaderBuilder(cx);
-        this.lb = new LoggerBuilder(cx);
-        this.mjsi = new MirthJavaScriptIncludes(cx);
+        this.classLoaderBuilder = new ClassLoaderBuilder(cx);
+        this.loggerBuilder = new LoggerBuilder(cx);
+        this.mirthJavaScriptIncludes = new MirthJavaScriptIncludes(cx);
     }
 
     MirthEnvBuilder.prototype.classLoaderBuilder = function classLoaderBuilder(builder) {
-        this.clb = builder;
+        this.classLoaderBuilder = builder;
         return this;
     }
 
     MirthEnvBuilder.prototype.loggerBuilder = function loggerBuilder(builder) {
-        this.lb = builder;
+        this.loggerBuilder = builder;
         return this;
     }
 
     MirthEnvBuilder.prototype.setMirthPath = function setMirthPath(pathString) {
-        this.clb = this.clb.setMirthPath(pathString);
+        this.classLoaderBuilder = this.classLoaderBuilder.setMirthPath(pathString);
         return this;
     }
 
     MirthEnvBuilder.prototype.applyToClassLoaderBuilder = function applyToClassLoaderBuilder(consumer) {
-        consumer(this.clb);
+        consumer(this.classLoaderBuilder);
         return this;
     }
 
     MirthEnvBuilder.prototype.applyToLoggerBuilder = function applyToLoggerBuilder(consumer) {
-        consumer(this.lb);
+        consumer(this.loggerBuilder);
         return this;
     }
 
     MirthEnvBuilder.prototype.applyToMirthJavaScriptIncludes = function applyToMirthJavaScriptIncludes(consumer) {
-        consumer(this.mjsi);
+        consumer(this.mirthJavaScriptIncludes);
         return this;
     }
 
     MirthEnvBuilder.prototype.init = function init() {
-        this.clb.build();
-        this.lb.build();
-        this.mjsi.init();
+        this.classLoaderBuilder.build();
+        this.loggerBuilder.build();
+        this.mirthJavaScriptIncludes.init();
     }
 
     return MirthEnvBuilder;
