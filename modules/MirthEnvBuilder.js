@@ -1,6 +1,7 @@
 var {ClassLoaderBuilder} = require('mirth/ClassLoaderBuilder');
 var {LoggerBuilder} = require('mirth/LoggerBuilder');
 var {MirthJavaScriptIncludes} = require('mirth/MirthJavaScriptIncludes');
+var {SerializerFactory} = require('mirth/SerializerFactory');
 
 exports.MirthEnvBuilder = (function() {
     function MirthEnvBuilder(cx) {
@@ -8,6 +9,7 @@ exports.MirthEnvBuilder = (function() {
         this.classLoaderBuilder = new ClassLoaderBuilder(cx);
         this.loggerBuilder = new LoggerBuilder(cx);
         this.mirthJavaScriptIncludes = new MirthJavaScriptIncludes(cx);
+        this.excludeSerializerFactory = false;
     }
 
     MirthEnvBuilder.prototype.classLoaderBuilder = function classLoaderBuilder(builder) {
@@ -17,6 +19,11 @@ exports.MirthEnvBuilder = (function() {
 
     MirthEnvBuilder.prototype.loggerBuilder = function loggerBuilder(builder) {
         this.loggerBuilder = builder;
+        return this;
+    }
+
+    MirthEnvBuilder.prototype.excludeSerializerFactory = function excludeSerializerFactory(bool) {
+        this.excludeSerializerFactory = Boolean(bool);
         return this;
     }
 
@@ -44,6 +51,7 @@ exports.MirthEnvBuilder = (function() {
         this.classLoaderBuilder.build();
         this.loggerBuilder.build();
         this.mirthJavaScriptIncludes.init();
+        if (!this.excludeSerializerFactory) this.cx.SerializerFactory = new SerializerFactory(this.cx);
     }
 
     return MirthEnvBuilder;
